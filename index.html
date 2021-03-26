@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Mongo Database  Test Here !!!</h1>
+    <form action="/addProduct" method="post">
+        <input type="text" placeholder="name" name="name">
+        <input type="text" placeholder="price" name="price">
+        <input type="text" placeholder="quantity" name="quantity">
+        <button type="submit">Add Product</button>
+    </form>
+    <div id="products">
+
+    </div>
+    <div id="update">
+
+    </div>
+    <script>
+        function loadAllProducts(){
+            fetch('/products')
+        .then(res => res.json())
+        .then(products => {
+            console.log(products);
+            const container = document.getElementById('products');
+            
+            products.forEach(pd =>{
+                const p = document.createElement('p');
+                p.innerHTML = `Product Name: <b>${pd.name}</b> Price: <b>${pd.price}</b> Quantity: <b>${pd.quantity}</b>
+                <button onclick = "loadProduct('${pd._id}')">Update</button>
+                <button onclick = "productDelete('${pd._id}')">Delete</button`;
+                container.appendChild(p);
+            })
+        })
+        }
+        loadAllProducts();
+
+        function loadProduct(id){
+            fetch(`product/${id}`)
+            .then(res =>res.json())
+            .then(data => {
+                const update = document.getElementById('update');
+                // console.log(update);
+                update.innerHTML = `
+                    <h3>Update: ${data._id}</h3>
+                    
+                    Price : <input type="number" value = "${data.price}" id = "price"><br>
+                    Quantity : <input type="number" value = "${data.quantity}" id = "quantity"><br>
+                    <button onclick = "updateProduct('${data._id}')" type ="submit">Submit</button>
+                `;
+            })
+        }
+        function updateProduct(id){
+           
+            const price = document.getElementById("price").value;
+            const quantity = document.getElementById("quantity").value;
+            const product = {id, price , quantity};
+            console.log(product)
+            fetch(`/update/${id}`, {
+                method: 'PATCH',
+                headers: {'Content-type': 'application/json'},
+                body: JSON.stringify(product)
+            })
+            .then(res =>res.json())
+            .then(data => {
+                console.log("updated");
+            })
+        }
+      
+        function productDelete(id){
+            fetch(`/delete/${id}`,{
+                method: 'DELETE'
+            })
+            .then(res => res.json()) 
+            .then(result => {
+                console.log('delete successful');
+            })
+        }
+    </script>
+</body>
+</html>
