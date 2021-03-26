@@ -27,12 +27,12 @@
         .then(products => {
             console.log(products);
             const container = document.getElementById('products');
-            
+            container.innerHTML = '';
             products.forEach(pd =>{
                 const p = document.createElement('p');
                 p.innerHTML = `Product Name: <b>${pd.name}</b> Price: <b>${pd.price}</b> Quantity: <b>${pd.quantity}</b>
                 <button onclick = "loadProduct('${pd._id}')">Update</button>
-                <button onclick = "productDelete('${pd._id}')">Delete</button`;
+                <button onclick = "productDelete(event , '${pd._id}')">Delete</button`;
                 container.appendChild(p);
             })
         })
@@ -59,6 +59,7 @@
             const price = document.getElementById("price").value;
             const quantity = document.getElementById("quantity").value;
             const product = {id, price , quantity};
+
             console.log(product)
             fetch(`/update/${id}`, {
                 method: 'PATCH',
@@ -66,18 +67,26 @@
                 body: JSON.stringify(product)
             })
             .then(res =>res.json())
-            .then(data => {
-                console.log("updated");
+            .then(result => {
+                if(result){
+                  loadAllProducts();
+                  document.getElementById('update').innerHTML = '';
+                //   const update = document.getElementById('update');
+                //   update.innerHTML = '';
+                }
             })
         }
       
-        function productDelete(id){
+        function productDelete(event, id){
+            console.log(event.target.parentNode);
             fetch(`/delete/${id}`,{
                 method: 'DELETE'
             })
             .then(res => res.json()) 
             .then(result => {
-                console.log('delete successful');
+                if(result){
+                    event.target.parentNode.style.display = 'none';
+                }
             })
         }
     </script>
